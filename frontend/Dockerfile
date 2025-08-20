@@ -12,7 +12,7 @@ COPY package*.json ./
 # If you use yarn: COPY yarn.lock ./
 
 # Install dependencies
-RUN npm ci
+RUN npm i
 
 # Copy the rest of the source code
 COPY . .
