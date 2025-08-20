@@ -14,7 +14,7 @@ app = FastAPI(title="Family Calendar Backend", version="0.1")
 origins = [
     "http://localhost:5173",  # Vite dev server
     "http://localhost:5174",  # Vite dev server (alternative port)
-    "http://10.0.0.201:5173" # VM IP if you access it externally
+    "http://10.0.0.201:3000" # VM IP if you access it externally
 ]
 
 app.add_middleware(
