@@ -303,12 +303,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .eventBadge:hover {
   transform: scale(1.05);
   border-color: #2563eb;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 :global(.dark) .eventBadge {
@@ -318,6 +320,7 @@
 
 :global(.dark) .eventBadge:hover {
   border-color: #3b82f6;
+  background-color: rgba(96, 165, 250, 0.1);
 }
 
 @media (min-width: 1200px) {

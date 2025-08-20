@@ -1,22 +1,41 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /app
+# -------------------------------
+# Stage 1: Build
+# -------------------------------
+FROM node:20-alpine AS build
+
+# Set working directory
 WORKDIR /app
+
+# Copy package.json and package-lock.json / pnpm-lock.yaml / yarn.lock
+COPY package*.json ./
+# If you use pnpm: COPY pnpm-lock.yaml ./
+# If you use yarn: COPY yarn.lock ./
+
+# Install dependencies
 RUN npm ci
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
+# Copy the rest of the source code
+COPY . .
 
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
+# Build the production app
 RUN npm run build
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["npm", "run", "start"]
+# -------------------------------
+# Stage 2: Serve
+# -------------------------------
+FROM nginx:alpine
+
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy built app from previous stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config if needed
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

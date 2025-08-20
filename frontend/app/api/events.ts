@@ -17,3 +17,9 @@ export async function createEvent(event: Omit<Event, "id">): Promise<Event> {
   if (!res.ok) throw new Error("Failed to create event");
   return res.json();
 }
+
+export async function fetchEventById(id: number): Promise<Event> {
+  const res = await fetch(`${API_BASE}/events/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch event");
+  return res.json();
+}

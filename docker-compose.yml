@@ -1,12 +1,26 @@
+version: "3.9"
+
 services:
   backend:
     build: ./backend
     container_name: family_calendar_backend
     ports:
       - "8000:8000"
+    environment:
+      - TZ=America/New_York  # Change this to your local timezone
     volumes:
       # Mount the data folder for your DB or other local storage
       - ./backend/data:/app/data
       # Mount credentials.json safely as read-only
       - ./backend/credentials.json:/app/core/credentials.json:ro
+    restart: unless-stopped
+    environment:
+      # Pass Google creds path if needed in code
+      GOOGLE_CREDS: /app/core/credentials.json
+
+  frontend:
+    build: ./frontend
+    container_name: family_calendar_frontend
+    ports:
+      - "5173:80"  # Expose nginx port
     restart: unless-stopped

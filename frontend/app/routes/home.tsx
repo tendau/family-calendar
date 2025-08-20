@@ -5,6 +5,7 @@ import type { LoaderFunction } from "react-router";
 
 import type { Event } from "../atoms/eventAtom";
 import { AddEventForm } from "../components/AddEventForm";
+import { EventDetailsModal } from "../components/EventDetailsModal";
 import { fetchEvents } from "../api/events";
 import styles from "./home.module.css";
 
@@ -20,6 +21,7 @@ export default function Home() {
   const events = useLoaderData() as Event[];
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 
   const goToPreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -122,7 +124,18 @@ export default function Home() {
               >
                 <div className={styles.dayNumber}>{format(day, "d")}</div>
                 {isCurrentMonth && eventsByDate[dayStr]?.map((event) => (
-                  <div key={event.id} className={styles.eventBadge}>
+                  <div 
+                    key={event.id} 
+                    className={styles.eventBadge}
+                    onClick={() => setSelectedEventId(event.id)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setSelectedEventId(event.id);
+                      }
+                    }}
+                  >
                     {event.title}
                   </div>
                 ))}
@@ -136,12 +149,23 @@ export default function Home() {
       <div className={styles.sidebar}>
         <h2 className={styles.sidebarTitle}>Upcoming Events</h2>
         {events
-          .sort((a, b) => a.date.localeCompare(b.date))
+          .sort((a, b) => a.start_time.localeCompare(b.start_time))
           .slice(0, 5)
           .map((event) => (
-            <div key={event.id} className={styles.sidebarEvent}>
+            <div 
+              key={event.id} 
+              className={styles.sidebarEvent}
+              onClick={() => setSelectedEventId(event.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setSelectedEventId(event.id);
+                }
+              }}
+            >
               <div className={styles.sidebarEventTitle}>{event.title}</div>
-              <div className={styles.sidebarEventDate}>{event.date}</div>
+              <div className={styles.sidebarEventDate}>{format(new Date(event.start_time), "MMM d, yyyy")}</div>
             </div>
           ))}
 
@@ -154,6 +178,14 @@ export default function Home() {
 
         {showForm && <AddEventForm onClose={() => setShowForm(false)} />}
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEventId && (
+        <EventDetailsModal 
+          eventId={selectedEventId} 
+          onClose={() => setSelectedEventId(null)} 
+        />
+      )}
     </div>
   );
 }
