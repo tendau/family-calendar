@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: ./backend
@@ -16,10 +14,17 @@ services:
       # Pass Google creds path if needed in code
       GOOGLE_CREDS: /app/core/credentials.json
 
-
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://backend:8000
     container_name: family_calendar_frontend
     ports:
-      - "5173:80"  # Expose nginx port
+      - "3000:3000"
     restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+
