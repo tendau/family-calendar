@@ -1,5 +1,6 @@
 # app/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.routers import events
 
@@ -7,6 +8,20 @@ from app.routers import events
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Family Calendar Backend", version="0.1")
+
+# Allow your frontend origin
+origins = [
+    "http://localhost:5173",  # Vite dev server
+    # "http://10.0.0.128:5173" # VM IP if you access it externally
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include routers
 app.include_router(events.router, prefix="/events", tags=["events"])
