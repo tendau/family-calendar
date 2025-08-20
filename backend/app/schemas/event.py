@@ -10,6 +10,7 @@ class EventBase(BaseModel):
     start_time: datetime
     end_time: datetime
     all_day: bool = False
+    google_id: Optional[str] = None
 
 
 class EventCreate(EventBase):
@@ -26,4 +27,4 @@ class EventRead(EventBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

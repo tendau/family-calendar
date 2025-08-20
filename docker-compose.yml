@@ -5,5 +5,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      # Mount the data folder for your DB or other local storage
       - ./backend/data:/app/data
+      # Mount credentials.json safely as read-only
+      - ./backend/credentials.json:/app/core/credentials.json:ro
     restart: unless-stopped

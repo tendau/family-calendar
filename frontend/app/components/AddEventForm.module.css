@@ -1,0 +1,184 @@
+/* AddEventForm.module.css */
+
+.formContainer {
+  padding: 1.5rem;
+  border: 2px solid transparent;
+  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
+              linear-gradient(135deg, #e2e8f0, #cbd5e1) border-box;
+  border-radius: 1rem;
+  margin-top: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+:global(.dark) .formContainer {
+  background: linear-gradient(rgba(30,41,59,0.8), rgba(30,41,59,0.8)) padding-box,
+              linear-gradient(135deg, #475569, #64748b) border-box;
+}
+
+.formTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .formTitle {
+  color: #f1f5f9;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+:global(.dark) .label {
+  color: #d1d5db;
+}
+
+.input {
+  border: 2px solid transparent;
+  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
+              linear-gradient(135deg, #e5e7eb, #d1d5db) border-box;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: #1f2937;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
+              linear-gradient(135deg, #3b82f6, #2563eb) border-box;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+:global(.dark) .input {
+  background: linear-gradient(rgba(55,65,81,0.8), rgba(55,65,81,0.8)) padding-box,
+              linear-gradient(135deg, #4b5563, #6b7280) border-box;
+  color: #f9fafb;
+}
+
+:global(.dark) .input:focus {
+  background: linear-gradient(rgba(55,65,81,0.9), rgba(55,65,81,0.9)) padding-box,
+              linear-gradient(135deg, #60a5fa, #3b82f6) border-box;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.textarea {
+  border: 2px solid transparent;
+  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
+              linear-gradient(135deg, #e5e7eb, #d1d5db) border-box;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: #1f2937;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.textarea:focus {
+  outline: none;
+  background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
+              linear-gradient(135deg, #3b82f6, #2563eb) border-box;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+:global(.dark) .textarea {
+  background: linear-gradient(rgba(55,65,81,0.8), rgba(55,65,81,0.8)) padding-box,
+              linear-gradient(135deg, #4b5563, #6b7280) border-box;
+  color: #f9fafb;
+}
+
+:global(.dark) .textarea:focus {
+  background: linear-gradient(rgba(55,65,81,0.9), rgba(55,65,81,0.9)) padding-box,
+              linear-gradient(135deg, #60a5fa, #3b82f6) border-box;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 2px solid transparent;
+  background: linear-gradient(#fef2f2, #fef2f2) padding-box,
+              linear-gradient(135deg, #fecaca, #f87171) border-box;
+  border-radius: 0.375rem;
+}
+
+:global(.dark) .errorMessage {
+  background: linear-gradient(#451a1a, #451a1a) padding-box,
+              linear-gradient(135deg, #7f1d1d, #dc2626) border-box;
+  color: #fca5a5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 1rem;
+  }
+  
+  .formTitle {
+    font-size: 1rem;
+  }
+  
+  .input,
+  .textarea {
+    padding: 0.625rem;
+    font-size: 0.8rem;
+  }
+  
+  .submitBtn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+  }
+}
