@@ -1,26 +1,24 @@
-# Stage 1: Build
-FROM node:18-alpine as build
-
+# ---- Build stage ----
+FROM node:20 AS build
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# Install deps
+COPY package*.json ./
 RUN npm install
 
+# Copy source and build
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve with nginx
-FROM nginx:alpine
+# ---- Production stage ----
+FROM nginx:stable-alpine AS production
+WORKDIR /usr/share/nginx/html
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+# Copy build output
+COPY --from=build /app/build . 
 
-# Add a custom config that handles React Router SPA routing
+# Copy custom nginx config for React Router
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# ---- IMPORTANT ----
-# If CRA: change /app/dist to /app/build
-COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
