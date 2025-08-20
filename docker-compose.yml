@@ -18,7 +18,7 @@ services:
     build: 
       context: ./frontend
       args:
-        VITE_API_BASE_URL: http://backend:8000
+        VITE_API_BASE_URL: http://10.0.0.201:8000
     container_name: family_calendar_frontend
     ports:
       - "3000:3000"
