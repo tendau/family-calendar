@@ -4,6 +4,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export async function fetchEvents(): Promise<Event[]> {
   const res = await fetch(`${API_BASE}/events`);
+  console.log("Fetching events:", res);
   if (!res.ok) throw new Error("Failed to fetch events");
   return res.json();
 }

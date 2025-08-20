@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import type { Event } from "../atoms/eventAtom";
 import { fetchEventById } from "../api/events";
+import { formatServerDate, formatServerTime, formatServerDateTimeWithTimezone } from "../utils/datetime";
 import styles from "./EventDetailsModal.module.css";
 
 interface EventDetailsModalProps {
@@ -33,34 +34,6 @@ export function EventDetailsModal({ eventId, onClose }: EventDetailsModalProps) 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
-    }
-  };
-
-  const formatDateTime = (dateTimeString: string) => {
-    try {
-      // Create date object - this will automatically convert to local timezone
-      const date = new Date(dateTimeString);
-      return format(date, "EEEE, MMM d, yyyy 'at' h:mm a");
-    } catch {
-      return dateTimeString;
-    }
-  };
-
-  const formatDate = (dateTimeString: string) => {
-    try {
-      const date = new Date(dateTimeString);
-      return format(date, "MMM d, yyyy");
-    } catch {
-      return dateTimeString;
-    }
-  };
-
-  const formatTime = (dateTimeString: string) => {
-    try {
-      const date = new Date(dateTimeString);
-      return format(date, "h:mm a");
-    } catch {
-      return dateTimeString;
     }
   };
 
@@ -114,10 +87,15 @@ export function EventDetailsModal({ eventId, onClose }: EventDetailsModalProps) 
                   <div className={styles.timePoint}>
                     <div className={styles.timeLabel}>Starts</div>
                     <div className={styles.timeValue}>
-                      {event.all_day ? formatDate(event.start_time) : (
+                      {event.all_day ? formatServerDate(event.start_time) : (
                         <>
-                          <div className={styles.timeDate}>{format(new Date(event.start_time), "EEEE, MMM d")}</div>
-                          <div className={styles.timeTime}>{formatTime(event.start_time)}</div>
+                          <div className={styles.timeDate}>{formatServerDateTimeWithTimezone(event.start_time).date}</div>
+                          <div className={styles.timeTime}>
+                            {formatServerDateTimeWithTimezone(event.start_time).time}
+                            <span className={styles.timezone}>
+                              {formatServerDateTimeWithTimezone(event.start_time).timezone}
+                            </span>
+                          </div>
                         </>
                       )}
                     </div>
@@ -131,10 +109,15 @@ export function EventDetailsModal({ eventId, onClose }: EventDetailsModalProps) 
                   <div className={styles.timePoint}>
                     <div className={styles.timeLabel}>Ends</div>
                     <div className={styles.timeValue}>
-                      {event.all_day ? formatDate(event.end_time) : (
+                      {event.all_day ? formatServerDate(event.end_time) : (
                         <>
-                          <div className={styles.timeDate}>{format(new Date(event.end_time), "EEEE, MMM d")}</div>
-                          <div className={styles.timeTime}>{formatTime(event.end_time)}</div>
+                          <div className={styles.timeDate}>{formatServerDateTimeWithTimezone(event.end_time).date}</div>
+                          <div className={styles.timeTime}>
+                            {formatServerDateTimeWithTimezone(event.end_time).time}
+                            <span className={styles.timezone}>
+                              {formatServerDateTimeWithTimezone(event.end_time).timezone}
+                            </span>
+                          </div>
                         </>
                       )}
                     </div>

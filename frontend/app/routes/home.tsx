@@ -7,6 +7,7 @@ import type { Event } from "../atoms/eventAtom";
 import { AddEventForm } from "../components/AddEventForm";
 import { EventDetailsModal } from "../components/EventDetailsModal";
 import { fetchEvents } from "../api/events";
+import { formatServerDate, parseServerDateTime } from "../utils/datetime";
 import styles from "./home.module.css";
 
 // --- Loader ---
@@ -49,8 +50,9 @@ export default function Home() {
 
   const eventsByDate: Record<string, Event[]> = {};
   events.forEach((e) => {
-    //get date from start_time
-    const date = e.start_time.split("T")[0];
+    // Parse the server datetime and convert to local timezone, then get the local date
+    const localDate = parseServerDateTime(e.start_time);
+    const date = format(localDate, "yyyy-MM-dd");
     if (!eventsByDate[date]) eventsByDate[date] = [];
     eventsByDate[date].push(e);
   });
@@ -165,7 +167,7 @@ export default function Home() {
               }}
             >
               <div className={styles.sidebarEventTitle}>{event.title}</div>
-              <div className={styles.sidebarEventDate}>{format(new Date(event.start_time), "MMM d, yyyy")}</div>
+              <div className={styles.sidebarEventDate}>{formatServerDate(event.start_time)}</div>
             </div>
           ))}
 
