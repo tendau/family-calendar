@@ -27,6 +27,8 @@ ENV/
 .Python
 db.sqlite3
 *.sqlite3
+data/
+calendar.db
 
 # Google API credentials
 credentials.json
