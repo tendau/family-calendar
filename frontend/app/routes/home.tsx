@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, startOfWeek, endOfWeek, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, startOfWeek, endOfWeek, addMonths, subMonths, addDays } from "date-fns";
 import { useLoaderData } from "react-router";
 import type { LoaderFunction } from "react-router";
 
 import type { Event } from "../atoms/eventAtom";
 import { AddEventForm } from "../components/AddEventForm";
 import { EventDetailsModal } from "../components/EventDetailsModal";
+import { DayModal } from "../components/DayModal";
 import { fetchEvents } from "../api/events";
-import { formatServerDate, parseServerDateTime } from "../utils/datetime";
+import { formatServerDate, parseServerDateTime, parseServerDate } from "../utils/datetime";
 import styles from "./home.module.css";
 
 // --- Loader ---
@@ -23,6 +24,7 @@ export default function Home() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [selectedDay, setSelectedDay] = useState<{ date: Date; events: Event[] } | null>(null);
 
   const goToPreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -48,13 +50,58 @@ export default function Home() {
 
   const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  // Map events to each calendar day they occupy (handles multi-day and all-day)
   const eventsByDate: Record<string, Event[]> = {};
+  const eventPositions: Record<string, Record<number, 'start' | 'middle' | 'end' | 'single'>> = {};
+  
   events.forEach((e) => {
-    // Parse the server datetime and convert to local timezone, then get the local date
-    const localDate = parseServerDateTime(e.start_time);
-    const date = format(localDate, "yyyy-MM-dd");
-    if (!eventsByDate[date]) eventsByDate[date] = [];
-    eventsByDate[date].push(e);
+    try {
+      if (e.all_day) {
+        // For all-day events, treat end_time as exclusive (typical calendar behavior)
+        const start = parseServerDate(e.start_time, true);
+        const end = parseServerDate(e.end_time, true);
+        // end is exclusive: we will iterate from start up to (but not including) end
+        const eventDays: string[] = [];
+        let cursor = start;
+        while (cursor < end) {
+          const dateKey = format(cursor, "yyyy-MM-dd");
+          eventDays.push(dateKey);
+          if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
+          eventsByDate[dateKey].push(e);
+          cursor = addDays(cursor, 1);
+        }
+        
+        // Set position indicators for multi-day events
+        eventDays.forEach((dateKey, index) => {
+          if (!eventPositions[dateKey]) eventPositions[dateKey] = {};
+          if (eventDays.length === 1) {
+            eventPositions[dateKey][e.id] = 'single';
+          } else if (index === 0) {
+            eventPositions[dateKey][e.id] = 'start';
+          } else if (index === eventDays.length - 1) {
+            eventPositions[dateKey][e.id] = 'end';
+          } else {
+            eventPositions[dateKey][e.id] = 'middle';
+          }
+        });
+      } else {
+        // Timed events: map to the start local date only (could be extended later)
+        const localDate = parseServerDateTime(e.start_time);
+        const dateKey = format(localDate, "yyyy-MM-dd");
+        if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
+        eventsByDate[dateKey].push(e);
+        if (!eventPositions[dateKey]) eventPositions[dateKey] = {};
+        eventPositions[dateKey][e.id] = 'single';
+      }
+    } catch (err) {
+      // Fallback to putting it on the start date
+      const localDate = parseServerDateTime(e.start_time);
+      const dateKey = format(localDate, "yyyy-MM-dd");
+      if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
+      eventsByDate[dateKey].push(e);
+      if (!eventPositions[dateKey]) eventPositions[dateKey] = {};
+      eventPositions[dateKey][e.id] = 'single';
+    }
   });
 
   console.log("Events by date:", eventsByDate);
@@ -112,6 +159,11 @@ export default function Home() {
           {days.map((day) => {
             const dayStr = format(day, "yyyy-MM-dd");
             const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+            const dayEvents = eventsByDate[dayStr] || [];
+            const maxVisibleEvents = 1;
+            const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+            const hiddenCount = dayEvents.length - maxVisibleEvents;
+            
             return (
               <div
                 key={dayStr}
@@ -123,24 +175,45 @@ export default function Home() {
                 style={{
                   opacity: isCurrentMonth ? 1 : 0.3
                 }}
+                onClick={() => {
+                  if (isCurrentMonth && dayEvents.length > 0) {
+                    setSelectedDay({ date: day, events: dayEvents });
+                  }
+                }}
               >
                 <div className={styles.dayNumber}>{format(day, "d")}</div>
-                {isCurrentMonth && eventsByDate[dayStr]?.map((event) => (
-                  <div 
-                    key={event.id} 
-                    className={styles.eventBadge}
-                    onClick={() => setSelectedEventId(event.id)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
+                {isCurrentMonth && visibleEvents.map((event) => {
+                  const position = eventPositions[dayStr]?.[event.id] || 'single';
+                  const baseClass = event.all_day ? `${styles.eventBadge} ${styles.eventBadgeAllDay}` : styles.eventBadge;
+                  const positionClass = event.all_day ? styles[`eventPosition${position.charAt(0).toUpperCase() + position.slice(1)}`] : '';
+                  
+                  return (
+                    <div 
+                      key={event.id} 
+                      className={`${baseClass} ${positionClass}`.trim()}
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setSelectedEventId(event.id);
-                      }
-                    }}
-                  >
-                    {event.title}
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          setSelectedEventId(event.id);
+                        }
+                      }}
+                      title={event.all_day ? `${event.title} (All Day)` : event.title}
+                    >
+                      {position === 'middle' ? '···' : event.title}
+                    </div>
+                  );
+                })}
+                {isCurrentMonth && hiddenCount > 0 && (
+                  <div className={styles.moreEventsIndicator}>
+                    +{hiddenCount} more
                   </div>
-                ))}
+                )}
               </div>
             );
           })}
@@ -186,6 +259,19 @@ export default function Home() {
         <EventDetailsModal 
           eventId={selectedEventId} 
           onClose={() => setSelectedEventId(null)} 
+        />
+      )}
+
+      {/* Day Modal */}
+      {selectedDay && (
+        <DayModal
+          date={selectedDay.date}
+          events={selectedDay.events}
+          onClose={() => setSelectedDay(null)}
+          onEventClick={(eventId) => {
+            setSelectedDay(null);
+            setSelectedEventId(eventId);
+          }}
         />
       )}
     </div>

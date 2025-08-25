@@ -16,7 +16,8 @@ FAMILY_CALENDAR_ID = "family02176623069150856419@group.calendar.google.com"
 @router.post("/sync")
 def sync_google_calendar(db: Session = Depends(get_db)):
     """
-    Fetch events from Google Calendar and insert or update them in the local DB.
+    Fetch events from Google Calendar and sync them with the local DB.
+    This includes adding new events, updating existing ones, and removing deleted events.
     """
     try:
         events = google.fetch_events(FAMILY_CALENDAR_ID)
@@ -24,7 +25,12 @@ def sync_google_calendar(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to fetch Google events: {e}")
 
     synced_count = 0
-
+    deleted_count = 0
+    
+    # Get all Google IDs from the fetched events
+    google_event_ids = {e["google_id"] for e in events}
+    
+    # Process each event from Google Calendar
     for e in events:
         # Check if event already exists in DB by google_id
         existing_event = db.query(Event).filter(Event.google_id == e["google_id"]).first()
@@ -48,5 +54,19 @@ def sync_google_calendar(db: Session = Depends(get_db)):
             db.add(new_event)
         synced_count += 1
 
+    # Find and delete local events that no longer exist in Google Calendar
+    # Only delete events that have a google_id (i.e., were synced from Google)
+    local_google_events = db.query(Event).filter(Event.google_id.isnot(None)).all()
+    
+    for local_event in local_google_events:
+        if local_event.google_id not in google_event_ids:
+            db.delete(local_event)
+            deleted_count += 1
+
     db.commit()
-    return {"status": "ok", "synced": synced_count}
+    return {
+        "status": "ok", 
+        "synced": synced_count, 
+        "deleted": deleted_count,
+        "message": f"Synced {synced_count} events, deleted {deleted_count} events"
+    }

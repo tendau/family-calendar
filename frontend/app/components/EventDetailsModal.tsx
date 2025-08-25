@@ -31,108 +31,87 @@ export function EventDetailsModal({ eventId, onClose }: EventDetailsModalProps) 
     loadEvent();
   }, [eventId]);
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
-      <div className={styles.modal}>
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '0.5rem' }}>
-              <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 10H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            Event Details
-          </h2>
-          <button className={styles.closeButton} onClick={onClose}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <h2 className={styles.title}>Event Details</h2>
+          <button 
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ×
           </button>
         </div>
 
         <div className={styles.content}>
-          {loading && <div className={styles.loading}>Loading event details...</div>}
+          {loading && (
+            <div className={styles.loading}>Loading event details...</div>
+          )}
           
-          {error && <div className={styles.error}>Error: {error}</div>}
+          {error && (
+            <div className={styles.error}>Error: {error}</div>
+          )}
           
           {event && (
             <div className={styles.eventDetails}>
-              {/* Event Title - Hero Section */}
-              <div className={styles.heroSection}>
+              <div className={styles.eventHeader}>
                 <h3 className={styles.eventTitle}>{event.title}</h3>
-                {event.description && (
-                  <p className={styles.eventDescription}>{event.description}</p>
-                )}
+                <div className={`${styles.eventType} ${event.all_day ? styles.allDay : styles.timed}`}>
+                  {event.all_day ? "ALL DAY" : "TIMED"}
+                </div>
               </div>
 
-              {/* Time Information - Creative Layout */}
-              <div className={styles.timeSection}>
-                <div className={styles.timeHeader}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                    <polyline points="12,6 12,12 16,14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span>Event Schedule</span>
+              {event.description && (
+                <div className={styles.eventDescription}>
+                  {event.description}
                 </div>
-                
-                <div className={styles.timeFlow}>
-                  <div className={styles.timePoint}>
-                    <div className={styles.timeLabel}>Starts</div>
-                    <div className={styles.timeValue}>
-                      {event.all_day ? formatServerDate(event.start_time) : (
-                        <>
-                          <div className={styles.timeDate}>{formatServerDateTimeWithTimezone(event.start_time).date}</div>
-                          <div className={styles.timeTime}>
-                            {formatServerDateTimeWithTimezone(event.start_time).time}
-                            <span className={styles.timezone}>
-                              {formatServerDateTimeWithTimezone(event.start_time).timezone}
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className={styles.timeDivider}>
-                    <div className={styles.timeLine}></div>
-                    <div className={styles.timeArrow}>→</div>
-                  </div>
-                  
-                  <div className={styles.timePoint}>
-                    <div className={styles.timeLabel}>Ends</div>
-                    <div className={styles.timeValue}>
-                      {event.all_day ? formatServerDate(event.end_time) : (
-                        <>
-                          <div className={styles.timeDate}>{formatServerDateTimeWithTimezone(event.end_time).date}</div>
-                          <div className={styles.timeTime}>
-                            {formatServerDateTimeWithTimezone(event.end_time).time}
-                            <span className={styles.timezone}>
-                              {formatServerDateTimeWithTimezone(event.end_time).timezone}
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
+              )}
+
+              <div className={styles.timeDetails}>
+                <div className={styles.timeItem}>
+                  <div className={styles.timeLabel}>Start Time</div>
+                  <div className={styles.timeValue}>
+                    {event.all_day ? (
+                      formatServerDate(event.start_time)
+                    ) : (
+                      <>
+                        <div className={styles.timeDate}>
+                          {formatServerDateTimeWithTimezone(event.start_time).date}
+                        </div>
+                        <div className={styles.timeTime}>
+                          {formatServerDateTimeWithTimezone(event.start_time).time}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
-                {event.all_day && (
-                  <div className={styles.allDayBadge}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor"/>
-                    </svg>
-                    All Day Event
+                <div className={styles.timeItem}>
+                  <div className={styles.timeLabel}>End Time</div>
+                  <div className={styles.timeValue}>
+                    {event.all_day ? (
+                      formatServerDate(event.end_time)
+                    ) : (
+                      <>
+                        <div className={styles.timeDate}>
+                          {formatServerDateTimeWithTimezone(event.end_time).date}
+                        </div>
+                        <div className={styles.timeTime}>
+                          {formatServerDateTimeWithTimezone(event.end_time).time}
+                        </div>
+                      </>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
+
+              {event.google_id && (
+                <div className={styles.googleBadge}>
+                  Synced with Google Calendar
+                </div>
+              )}
             </div>
           )}
         </div>

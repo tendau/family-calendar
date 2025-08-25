@@ -13,6 +13,23 @@ export const parseServerDateTime = (dateTimeString: string): Date => {
 };
 
 /**
+ * Parse a server datetime as a local Date representing the calendar day.
+ * For all-day events we must avoid timezone shifts: construct a local
+ * midnight for the YYYY-MM-DD portion so the event appears on the
+ * correct local day(s).
+ */
+export const parseServerDate = (dateTimeString: string, allDay = false): Date => {
+  if (allDay) {
+    // Expect "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS"; take the date portion
+    const datePart = dateTimeString.split('T')[0];
+    const [y, m, d] = datePart.split('-').map((s) => parseInt(s, 10));
+    // Create a local Date at local midnight for that calendar day
+    return new Date(y, m - 1, d);
+  }
+  return parseServerDateTime(dateTimeString);
+};
+
+/**
  * Format a server datetime string to local date and time
  */
 export const formatServerDateTime = (dateTimeString: string): string => {
