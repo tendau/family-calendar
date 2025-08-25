@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 import os
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from google.auth.transport.requests import Request
 
 # Scopes for read/write access (change to readonly if you only want to fetch)
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
