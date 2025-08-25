@@ -1,7 +1,7 @@
 from google_auth_oauthlib.flow import InstalledAppFlow
 import json
 
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 flow = InstalledAppFlow.from_client_secrets_file(
     '../app/core/credentials.json', SCOPES)

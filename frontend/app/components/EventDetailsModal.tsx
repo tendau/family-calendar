@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import type { Event } from "../atoms/eventAtom";
 import { fetchEventById } from "../api/events";
 import { formatServerDate, formatServerTime, formatServerDateTimeWithTimezone } from "../utils/datetime";
+import { MdClose } from "react-icons/md";
 import styles from "./EventDetailsModal.module.css";
 
 interface EventDetailsModalProps {
@@ -41,7 +42,7 @@ export function EventDetailsModal({ eventId, onClose }: EventDetailsModalProps) 
             onClick={onClose}
             aria-label="Close"
           >
-            ×
+            <MdClose />
           </button>
         </div>
 

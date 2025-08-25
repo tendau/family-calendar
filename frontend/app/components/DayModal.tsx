@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import type { Event } from "../atoms/eventAtom";
 import { formatServerTime } from "../utils/datetime";
+import { MdClose } from "react-icons/md";
 import styles from "./DayModal.module.css";
 
 export interface DayModalProps {
@@ -30,7 +31,7 @@ export function DayModal({ date, events, onClose, onEventClick }: DayModalProps)
             onClick={onClose}
             aria-label="Close"
           >
-            ×
+            <MdClose />
           </button>
         </div>
         

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { MdClose } from "react-icons/md";
 import styles from "./Toast.module.css";
 
 export interface ToastProps {
@@ -19,7 +20,7 @@ export function Toast({ message, type = "info", duration = 3000, onClose }: Toas
       <div className={styles.content}>
         <span className={styles.message}>{message}</span>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
-          ×
+          <MdClose />
         </button>
       </div>
     </div>

@@ -1,141 +1,353 @@
-/* AddEventForm.module.css */
+/* AddEventForm.module.css - Modern Modal Form */
 
-.formContainer {
-  padding: 1.5rem;
-  border: 2px solid transparent;
-  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
-              linear-gradient(135deg, #e2e8f0, #cbd5e1) border-box;
-  border-radius: 1rem;
-  margin-top: 1rem;
-  backdrop-filter: blur(10px);
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--theme-modal-overlay, rgba(0, 0, 0, 0.5));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+  padding: 1rem;
 }
 
-:global(.dark) .formContainer {
-  background: linear-gradient(rgba(30,41,59,0.8), rgba(30,41,59,0.8)) padding-box,
-              linear-gradient(135deg, #475569, #64748b) border-box;
+/* Form Modal */
+.formModal {
+  background: var(--theme-modal-bg, #ffffff);
+  border-radius: 1rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--theme-modal-border, #e5e7eb);
+  color: var(--theme-modal-text, #1f2937);
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+:global(.dark) .formModal {
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  color: var(--theme-modal-text, #f3f4f6);
+}
+
+/* Form Header */
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--theme-modal-border, #e5e7eb);
+  background: var(--theme-modal-bg, #ffffff);
+  filter: brightness(0.98);
+}
+
+:global(.dark) .formHeader {
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  filter: brightness(1.05);
 }
 
 .formTitle {
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
+  color: var(--theme-modal-text, #1f2937);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 :global(.dark) .formTitle {
-  color: #f1f5f9;
+  color: var(--theme-modal-text, #f3f4f6);
+}
+
+.titleIcon {
+  font-size: 1.5rem;
+  color: var(--theme-primary, #3b82f6);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--theme-modal-text, #6b7280);
+  opacity: 0.6;
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--theme-modal-text, #374151);
+  opacity: 1;
+}
+
+:global(.dark) .closeBtn {
+  color: var(--theme-modal-text, #9ca3af);
+}
+
+:global(.dark) .closeBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--theme-modal-text, #d1d5db);
+}
+
+/* Form Content */
+.form {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .label {
   font-weight: 500;
-  color: #374151;
+  color: var(--theme-modal-text, #374151);
   font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
 :global(.dark) .label {
-  color: #d1d5db;
+  color: var(--theme-modal-text, #d1d5db);
+}
+
+.labelIcon {
+  font-size: 1rem;
+  color: var(--theme-primary, #3b82f6);
 }
 
 .input {
-  border: 2px solid transparent;
-  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
-              linear-gradient(135deg, #e5e7eb, #d1d5db) border-box;
+  border: 1px solid var(--theme-modal-border, #d1d5db);
+  background: var(--theme-modal-bg, #ffffff);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  color: #1f2937;
+  color: var(--theme-modal-text, #1f2937);
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .input:focus {
   outline: none;
-  background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
-              linear-gradient(135deg, #3b82f6, #2563eb) border-box;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--theme-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--theme-primary, #3b82f6)20;
 }
 
 :global(.dark) .input {
-  background: linear-gradient(rgba(55,65,81,0.8), rgba(55,65,81,0.8)) padding-box,
-              linear-gradient(135deg, #4b5563, #6b7280) border-box;
-  color: #f9fafb;
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  color: var(--theme-modal-text, #f9fafb);
 }
 
 :global(.dark) .input:focus {
-  background: linear-gradient(rgba(55,65,81,0.9), rgba(55,65,81,0.9)) padding-box,
-              linear-gradient(135deg, #60a5fa, #3b82f6) border-box;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  border-color: var(--theme-accent, #60a5fa);
+  box-shadow: 0 0 0 3px var(--theme-accent, #60a5fa)20;
 }
 
 .textarea {
-  border: 2px solid transparent;
-  background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)) padding-box,
-              linear-gradient(135deg, #e5e7eb, #d1d5db) border-box;
+  border: 1px solid var(--theme-modal-border, #d1d5db);
+  background: var(--theme-modal-bg, #ffffff);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  color: #1f2937;
+  color: var(--theme-modal-text, #1f2937);
   font-size: 0.875rem;
   transition: all 0.2s ease;
   resize: vertical;
   min-height: 80px;
+  font-family: inherit;
 }
 
 .textarea:focus {
   outline: none;
-  background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
-              linear-gradient(135deg, #3b82f6, #2563eb) border-box;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--theme-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--theme-primary, #3b82f6)20;
 }
 
 :global(.dark) .textarea {
-  background: linear-gradient(rgba(55,65,81,0.8), rgba(55,65,81,0.8)) padding-box,
-              linear-gradient(135deg, #4b5563, #6b7280) border-box;
-  color: #f9fafb;
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  color: var(--theme-modal-text, #f9fafb);
 }
 
 :global(.dark) .textarea:focus {
-  background: linear-gradient(rgba(55,65,81,0.9), rgba(55,65,81,0.9)) padding-box,
-              linear-gradient(135deg, #60a5fa, #3b82f6) border-box;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  border-color: var(--theme-accent, #60a5fa);
+  box-shadow: 0 0 0 3px var(--theme-accent, #60a5fa)20;
+}
+
+/* Checkbox Row */
+.checkboxRow {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .checkboxGroup {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .checkbox {
-  width: 1rem;
-  height: 1rem;
-  accent-color: #3b82f6;
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--theme-primary, #3b82f6);
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-weight: 500;
+  color: var(--theme-modal-text, #374151);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+:global(.dark) .checkboxLabel {
+  color: var(--theme-modal-text, #d1d5db);
+}
+
+/* Date/Time Section */
+.dateTimeSection {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--theme-modal-border, #e5e7eb);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+:global(.dark) .dateTimeSection {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+}
+
+.dateTimeGroup {
+  margin-bottom: 1rem;
+}
+
+.dateTimeGroup:last-child {
+  margin-bottom: 0;
+}
+
+.dateTimeInputs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* DatePicker Styling */
+.datePicker,
+.timePicker {
+  border: 1px solid var(--theme-modal-border, #d1d5db);
+  background: var(--theme-modal-bg, #ffffff);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: var(--theme-modal-text, #1f2937);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.datePicker:focus,
+.timePicker:focus {
+  outline: none;
+  border-color: var(--theme-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--theme-primary, #3b82f6)20;
+}
+
+:global(.dark) .datePicker,
+:global(.dark) .timePicker {
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  color: var(--theme-modal-text, #f9fafb);
+}
+
+:global(.dark) .datePicker:focus,
+:global(.dark) .timePicker:focus {
+  border-color: var(--theme-accent, #60a5fa);
+  box-shadow: 0 0 0 3px var(--theme-accent, #60a5fa)20;
+}
+
+/* Button Group */
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  background: transparent;
+  color: var(--theme-modal-text, #6b7280);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--theme-modal-border, #d1d5db);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--theme-modal-text, #9ca3af);
+}
+
+:global(.dark) .cancelBtn {
+  color: var(--theme-modal-text, #9ca3af);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+}
+
+:global(.dark) .cancelBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--theme-modal-text, #d1d5db);
 }
 
 .submitBtn {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #fff;
-  padding: 0.875rem 1.5rem;
+  background: var(--theme-primary, #3b82f6);
+  color: white;
+  padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.875rem;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 2px 8px var(--theme-primary, #3b82f6)30;
 }
 
 .submitBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: var(--theme-secondary, #2563eb);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px var(--theme-primary, #3b82f6)40;
 }
 
 .submitBtn:disabled {
@@ -144,41 +356,162 @@
   transform: none;
 }
 
-.errorMessage {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border: 2px solid transparent;
-  background: linear-gradient(#fef2f2, #fef2f2) padding-box,
-              linear-gradient(135deg, #fecaca, #f87171) border-box;
-  border-radius: 0.375rem;
+/* React DatePicker Custom Styling */
+:global(.react-datepicker-wrapper) {
+  width: 100%;
 }
 
-:global(.dark) .errorMessage {
-  background: linear-gradient(#451a1a, #451a1a) padding-box,
-              linear-gradient(135deg, #7f1d1d, #dc2626) border-box;
-  color: #fca5a5;
+:global(.react-datepicker__input-container input) {
+  width: 100% !important;
+  border: 1px solid var(--theme-modal-border, #d1d5db) !important;
+  background: var(--theme-modal-bg, #ffffff) !important;
+  color: var(--theme-modal-text, #1f2937) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
 }
 
-/* Responsive adjustments */
+:global(.dark .react-datepicker__input-container input) {
+  background: var(--theme-modal-bg, #374151) !important;
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--theme-modal-text, #f9fafb) !important;
+}
+
+:global(.react-datepicker__input-container input:focus) {
+  outline: none !important;
+  border-color: var(--theme-primary, #3b82f6) !important;
+  box-shadow: 0 0 0 3px var(--theme-primary, #3b82f6)20 !important;
+}
+
+:global(.dark .react-datepicker__input-container input:focus) {
+  border-color: var(--theme-accent, #60a5fa) !important;
+  box-shadow: 0 0 0 3px var(--theme-accent, #60a5fa)20 !important;
+}
+
+:global(.react-datepicker) {
+  font-family: inherit;
+  border: 1px solid var(--theme-modal-border, #d1d5db);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background: var(--theme-modal-bg, #ffffff);
+}
+
+:global(.dark .react-datepicker) {
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+  color: var(--theme-modal-text, #f9fafb);
+}
+
+:global(.react-datepicker__header) {
+  background: var(--theme-primary, #3b82f6);
+  border-bottom: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+:global(.react-datepicker__current-month),
+:global(.react-datepicker__day-name) {
+  color: white;
+}
+
+:global(.react-datepicker__day) {
+  color: var(--theme-modal-text, #1f2937);
+}
+
+:global(.dark .react-datepicker__day) {
+  color: var(--theme-modal-text, #f9fafb);
+}
+
+:global(.react-datepicker__day--selected) {
+  background: var(--theme-primary, #3b82f6);
+  color: white;
+}
+
+:global(.react-datepicker__day--keyboard-selected) {
+  background: var(--theme-accent, #60a5fa);
+  color: white;
+}
+
+:global(.react-datepicker__day:hover) {
+  background: var(--theme-accent, #60a5fa);
+  color: white;
+}
+
+:global(.react-datepicker__time-container) {
+  background: var(--theme-modal-bg, #ffffff);
+  border-left: 1px solid var(--theme-modal-border, #d1d5db);
+}
+
+:global(.dark .react-datepicker__time-container) {
+  background: var(--theme-modal-bg, #374151);
+  border-color: var(--theme-modal-border, rgba(255, 255, 255, 0.1));
+}
+
+:global(.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box) {
+  width: 120px;
+}
+
+:global(.react-datepicker__time-list-item) {
+  color: var(--theme-modal-text, #1f2937);
+}
+
+:global(.dark .react-datepicker__time-list-item) {
+  color: var(--theme-modal-text, #f9fafb);
+}
+
+:global(.react-datepicker__time-list-item:hover) {
+  background: var(--theme-accent, #60a5fa);
+  color: white;
+}
+
+:global(.react-datepicker__time-list-item--selected) {
+  background: var(--theme-primary, #3b82f6);
+  color: white;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .formContainer {
+  .modalOverlay {
+    padding: 0.5rem;
+  }
+  
+  .formModal {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+  
+  .formHeader {
+    padding: 1rem;
+  }
+  
+  .form {
     padding: 1rem;
   }
   
   .formTitle {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
   
-  .input,
-  .textarea {
-    padding: 0.625rem;
-    font-size: 0.8rem;
+  .checkboxRow {
+    gap: 1rem;
   }
   
+  .dateTimeInputs {
+    flex-direction: column;
+  }
+  
+  .datePicker,
+  .timePicker {
+    min-width: unset;
+  }
+  
+  .buttonGroup {
+    flex-direction: column-reverse;
+  }
+  
+  .cancelBtn,
   .submitBtn {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.8rem;
+    width: 100%;
+    justify-content: center;
   }
 }
