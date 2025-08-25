@@ -1,30 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { MdClose, MdEvent, MdDateRange } from "react-icons/md";
 import { eventsAtom, type Event } from "../atoms/eventAtom";
-import { createEvent } from "../api/events";
+import { updateEvent } from "../api/events";
 import { Toast } from "./Toast";
+import { parseServerDate, parseServerDateTime } from "../utils/datetime";
 import styles from "./AddEventForm.module.css";
 
-interface AddEventFormProps {
+interface EditEventFormProps {
+  event: Event;
   onClose?: () => void;
-  initialDate?: Date;
+  onUpdate?: (updatedEvent: Event) => void;
 }
 
-export const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, initialDate }) => {
-  const [, setEvents] = useAtom(eventsAtom);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState(
-    initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-  );
-  const [endDate, setEndDate] = useState(
-    initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-  );
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
-  const [allDay, setAllDay] = useState(false);
-  const [multiDay, setMultiDay] = useState(false);
+export const EditEventForm: React.FC<EditEventFormProps> = ({ event, onClose, onUpdate }) => {
+  const [events, setEvents] = useAtom(eventsAtom);
+  const [title, setTitle] = useState(event.title);
+  const [description, setDescription] = useState(event.description || "");
+  
+  // Parse the initial dates from the event
+  const [startDate, setStartDate] = useState(() => {
+    try {
+      const date = event.all_day ? parseServerDate(event.start_time) : parseServerDateTime(event.start_time);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return new Date().toISOString().split('T')[0];
+    }
+  });
+  
+  const [endDate, setEndDate] = useState(() => {
+    try {
+      const date = event.all_day ? parseServerDate(event.end_time) : parseServerDateTime(event.end_time);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return new Date().toISOString().split('T')[0];
+    }
+  });
+  
+  const [startTime, setStartTime] = useState(() => {
+    if (event.all_day) return "09:00";
+    try {
+      const date = parseServerDateTime(event.start_time);
+      return date.toTimeString().slice(0, 5);
+    } catch {
+      return "09:00";
+    }
+  });
+  
+  const [endTime, setEndTime] = useState(() => {
+    if (event.all_day) return "10:00";
+    try {
+      const date = parseServerDateTime(event.end_time);
+      return date.toTimeString().slice(0, 5);
+    } catch {
+      return "10:00";
+    }
+  });
+  
+  const [allDay, setAllDay] = useState(event.all_day);
+  const [multiDay, setMultiDay] = useState(() => {
+    // Check if it's multi-day by comparing dates
+    try {
+      const start = event.all_day ? parseServerDate(event.start_time) : parseServerDateTime(event.start_time);
+      const end = event.all_day ? parseServerDate(event.end_time) : parseServerDateTime(event.end_time);
+      return start.toDateString() !== end.toDateString();
+    } catch {
+      return false;
+    }
+  });
+  
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
@@ -70,27 +114,23 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, initialDate
         endDateTime = endDateTime_obj.toISOString();
       }
 
-      const newEvent = await createEvent({
+      const updatedEvent = await updateEvent(event.id, {
         title,
         description,
         start_time: startDateTime,
         end_time: endDateTime,
         all_day: allDay,
-      } as Event);
+      });
 
-      setToast({ message: "Event created successfully!", type: "success" });
-      setEvents((prev) => [...prev, newEvent]);
+      setToast({ message: "Event updated successfully!", type: "success" });
       
-      // Reset form
-      setTitle("");
-      setDescription("");
-      const resetDate = initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-      setStartDate(resetDate);
-      setEndDate(resetDate);
-      setStartTime("09:00");
-      setEndTime("10:00");
-      setAllDay(false);
-      setMultiDay(false);
+      // Update the events atom
+      setEvents((prev) => prev.map(e => e.id === event.id ? updatedEvent : e));
+      
+      // Call the onUpdate callback if provided
+      if (onUpdate) {
+        onUpdate(updatedEvent);
+      }
       
       // Close after success
       setTimeout(() => {
@@ -99,7 +139,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, initialDate
       
     } catch (err) {
       console.error(err);
-      setToast({ message: "Failed to create event", type: "error" });
+      setToast({ message: "Failed to update event", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -115,7 +155,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, initialDate
         <div className={styles.formHeader}>
           <h3 className={styles.formTitle}>
             <MdEvent className={styles.titleIcon} />
-            Add New Event
+            Edit Event
           </h3>
           <button 
             onClick={handleCancel}
@@ -249,7 +289,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, initialDate
               className={styles.submitBtn} 
               disabled={loading || !title}
             >
-              {loading ? "Creating..." : "Create Event"}
+              {loading ? "Updating..." : "Update Event"}
             </button>
           </div>
         </form>

@@ -24,3 +24,20 @@ export async function fetchEventById(id: number): Promise<Event> {
   if (!res.ok) throw new Error("Failed to fetch event");
   return res.json();
 }
+
+export async function updateEvent(id: number, event: Partial<Omit<Event, "id">>): Promise<Event> {
+  const res = await fetch(`${API_BASE}/events/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(event),
+  });
+  if (!res.ok) throw new Error("Failed to update event");
+  return res.json();
+}
+
+export async function deleteEvent(id: number): Promise<void> {
+  const res = await fetch(`${API_BASE}/events/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete event");
+}
